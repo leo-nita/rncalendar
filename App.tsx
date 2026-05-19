@@ -13,7 +13,6 @@ function App() {
 }
 
 function AppContent() {
-  console.log('tess');
   return <View style={styles.container}></View>;
 }
 
