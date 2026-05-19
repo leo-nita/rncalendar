@@ -64,6 +64,7 @@ yarn-error.log
 .metro-health-check*
 
 # testing
+# testing
 /coverage
 
 # Yarn
@@ -73,3 +74,19 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Git-Secret Configuration
+# ----------------------------------------------------
+# 1. Protect local GPG files inside the secret folder
+.gitsecret/keys/random_seed
+.gitsecret/keys/trustdb.gpg
+
+# 2. ALWAYS ignore your actual raw, unencrypted secret files!
+# (Add the actual names of your plain-text secret files here)
+.env
+secrets.txt
+config/private_keys.json
+
+# 3. Explicitly ensure encrypted files are NEVER ignored
+!*.secret
+node_modules/
