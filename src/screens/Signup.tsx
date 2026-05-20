@@ -1,12 +1,19 @@
-import { useState } from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { useState, useTransition } from 'react';
+import { Button, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { authService } from '../services/authService';
 import InputField from '../components/Input';
 import { validateEmail, validatePassword } from '../utils/validate';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({ email: '', password: '' });
+
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+  });
+
+  const [isPending, startTransition] = useTransition();
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -17,7 +24,6 @@ const SignUp = () => {
     setPassword(text);
     if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
   };
-
   const handleSignup = () => {
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password, true);
@@ -26,7 +32,12 @@ const SignUp = () => {
       setErrors({ email: emailError, password: passwordError });
       return;
     }
+
     setErrors({ email: '', password: '' });
+
+    startTransition(async () => {
+      await authService.signUp(email, password);
+    });
   };
 
   return (
@@ -47,8 +58,11 @@ const SignUp = () => {
         onChangeText={handlePasswordChange}
         error={errors.password}
       />
-
-      <Button title="Signup" onPress={handleSignup} />
+      {isPending ? (
+        <ActivityIndicator size="small" color="#0000ff" style={styles.loader} />
+      ) : (
+        <Button title="Signup" onPress={handleSignup} />
+      )}
     </View>
   );
 };
@@ -61,5 +75,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#fff',
+  },
+  loader: {
+    marginVertical: 10,
   },
 });
