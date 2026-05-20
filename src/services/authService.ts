@@ -38,4 +38,12 @@ export const authService = {
       throw error;
     }
   },
+  login: async (email: string, password: string) => {
+    try {
+      return await auth().signInWithEmailAndPassword(email.trim(), password);
+    } catch (error) {
+      handleGlobalBackendError(error as FirebaseErrors);
+      throw error;
+    }
+  },
 };
