@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "name": "Simulator",
+      "type": "radon-ide",
+      "request": "launch",
+      "appRoot": "./",
+      "env": {},
+      "ios": {},
+      "android": {},
+      "usePrebuild": false
+    }
+  ]
+}
