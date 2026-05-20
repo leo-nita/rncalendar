@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "124704605686",
+    "project_id": "rncalendarapp",
+    "storage_bucket": "rncalendarapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:124704605686:android:effdb67b6748180c7933d7",
+        "android_client_info": {
+          "package_name": "com.rncalendarapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuk_qU91VXMSmE8SkVz4elnBgiw4Hbzlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
