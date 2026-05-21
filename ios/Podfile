@@ -5,7 +5,7 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, '15.1'
+platform :ios, '15.5'
 
 prepare_react_native_project!
 
@@ -27,12 +27,25 @@ target 'RNCalendarApp' do
       :mac_catalyst_enabled => false,
     )
 
-    # 🟩 FIX: Tell Xcode to allow RNFB modules to search non-modular React headers
+    # Loop through all pod targets to configure compilation settings
     installer.pods_project.targets.each do |target|
+      # 🟩 FIX: Tell Xcode to allow RNFB modules to search non-modular React headers
       if ['RNFBApp', 'RNFBAuth'].include?(target.name)
         target.build_configurations.each do |config|
           config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
         end
+      end
+
+      # 🟩 FIX: Configure C++20 and Swift Interop for VisionCamera V5 / NitroModules on Xcode 16+
+      target.build_configurations.each do |config|
+        # Force C++20 standard required by Nitro Modules
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+        
+        # Explicitly enable Swift-C++ Interop for Xcode 16+
+        config.build_settings['SWIFT_CXX_INTEROPERABILITY_MODE'] = 'default'
+        
+        # Relax Xcode 16's strict Swift 6 concurrency checks on third-party pods
+        config.build_settings['SWIFT_STRICT_CONCURRENCY'] = 'disabled'
       end
     end
 
