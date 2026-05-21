@@ -1,5 +1,5 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-
+import { storage } from './storage';
 type FirebaseErrors = Pick<
   FirebaseAuthTypes.NativeFirebaseAuthError,
   'code' | 'message'
@@ -7,7 +7,6 @@ type FirebaseErrors = Pick<
 
 export const handleGlobalBackendError = (error: FirebaseErrors) => {
   let backendMessage = 'An unexpected error occurred. Please try again.';
-
   switch (error.code) {
     case 'auth/email-already-in-use':
       backendMessage = 'This email address is already registered.';
@@ -29,21 +28,45 @@ export const handleGlobalBackendError = (error: FirebaseErrors) => {
 export const authService = {
   signUp: async (email: string, password: string) => {
     try {
-      return await auth().createUserWithEmailAndPassword(
+      const userCredential = await auth().createUserWithEmailAndPassword(
         email.trim(),
         password,
       );
+      const token = await userCredential.user.getIdToken();
+
+      storage.set('userToken', token);
+      storage.set('userEmail', email.trim());
+
+      return { user: userCredential.user, token };
     } catch (error) {
-      handleGlobalBackendError(error as FirebaseErrors);
-      throw error;
+      const msg = handleGlobalBackendError(error as FirebaseErrors);
+      throw new Error(msg);
     }
   },
   login: async (email: string, password: string) => {
     try {
-      return await auth().signInWithEmailAndPassword(email.trim(), password);
+      const userCredential = await auth().signInWithEmailAndPassword(
+        email.trim(),
+        password,
+      );
+      const token = await userCredential.user.getIdToken();
+
+      storage.set('userToken', token);
+      storage.set('userEmail', email.trim());
+
+      return { user: userCredential.user, token };
     } catch (error) {
-      handleGlobalBackendError(error as FirebaseErrors);
-      throw error;
+      const msg = handleGlobalBackendError(error as FirebaseErrors);
+      throw new Error(msg);
     }
+  },
+
+  logout: async () => {
+    // We still await Firebase logging out over the network...
+    await auth().signOut();
+
+    // Fix: MMKV uses deleteKey() to erase individual data fields
+    storage.remove('userToken');
+    storage.remove('userEmail');
   },
 };

@@ -3,15 +3,14 @@ import { Button, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { authService } from '../services/authService';
 import InputField from '../components/Input';
 import { validateEmail, validatePassword } from '../utils/validate';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  const { setIsAuthenticated, setUserEmail } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const [errors, setErrors] = useState({
-    email: '',
-    password: '',
-  });
+  const [errors, setErrors] = useState({ email: '', password: '' });
 
   const [isPending, startTransition] = useTransition();
 
@@ -24,9 +23,10 @@ const Login = () => {
     setPassword(text);
     if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
   };
-  const handleSignup = () => {
+
+  const handleLogin = () => {
     const emailError = validateEmail(email);
-    const passwordError = validatePassword(password, true);
+    const passwordError = validatePassword(password, false);
 
     if (emailError || passwordError) {
       setErrors({ email: emailError, password: passwordError });
@@ -36,7 +36,13 @@ const Login = () => {
     setErrors({ email: '', password: '' });
 
     startTransition(async () => {
-      await authService.login(email, password);
+      try {
+        await authService.login(email, password);
+        setUserEmail(email.trim());
+        setIsAuthenticated(true);
+      } catch {
+        // Intercepted safely. Your service layer handles global visual error banners.
+      }
     });
   };
 
@@ -58,10 +64,11 @@ const Login = () => {
         onChangeText={handlePasswordChange}
         error={errors.password}
       />
+
       {isPending ? (
         <ActivityIndicator size="small" color="#0000ff" style={styles.loader} />
       ) : (
-        <Button title="Login" onPress={handleSignup} />
+        <Button title="Login" onPress={handleLogin} />
       )}
     </View>
   );
