@@ -17,6 +17,7 @@ type InputFieldProps = {
   inputStyle?: StyleProp<TextStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
+  errorTextStyle?: StyleProp<TextStyle>;
 } & Omit<TextInputProps, 'value' | 'onChangeText' | 'style'>;
 
 const InputField = ({
@@ -27,6 +28,7 @@ const InputField = ({
   inputStyle,
   containerStyle,
   labelStyle,
+  errorTextStyle,
   ...props
 }: InputFieldProps) => {
   return (
@@ -40,7 +42,9 @@ const InputField = ({
         style={[styles.input, error && styles.inputError, inputStyle]}
       />
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error ? (
+        <Text style={[styles.errorText, errorTextStyle]}>{error}</Text>
+      ) : null}
     </View>
   );
 };

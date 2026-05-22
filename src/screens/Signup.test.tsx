@@ -1,14 +1,35 @@
-// SignUp.test.tsx
-
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import SignUp from '../screens/SignUp';
+import { NavigationContainer } from '@react-navigation/native';
+import SignUp from './Signup';
 import { validateEmail, validatePassword } from '../utils/validate';
+import { AuthProvider } from '../context/AuthContext';
 
 jest.mock('../utils/validate', () => ({
   validateEmail: jest.fn(),
   validatePassword: jest.fn(),
 }));
+
+jest.mock('../services/sessionStorage', () => ({
+  sessionStorage: {
+    getSession: jest.fn(() => null),
+    ensureBiometricPreference: jest.fn(),
+    isBiometricGateEnabled: jest.fn(() => false),
+  },
+}));
+
+jest.mock('../hooks/useBackgroundLock', () => ({
+  useBackgroundLock: jest.fn(),
+}));
+
+const renderSignUp = () =>
+  render(
+    <AuthProvider>
+      <NavigationContainer>
+        <SignUp />
+      </NavigationContainer>
+    </AuthProvider>,
+  );
 
 describe('SignUp Screen', () => {
   beforeEach(() => {
@@ -16,15 +37,15 @@ describe('SignUp Screen', () => {
   });
 
   it('renders all fields and signup button', () => {
-    const { getByPlaceholderText, getByText } = render(<SignUp />);
+    const { getByPlaceholderText, getByText } = renderSignUp();
 
     expect(getByPlaceholderText('example@domain.com')).toBeTruthy();
     expect(getByPlaceholderText('Minimum 8 characters')).toBeTruthy();
-    expect(getByText('Signup')).toBeTruthy();
+    expect(getByText('SIGN UP')).toBeTruthy();
   });
 
   it('updates input values correctly', () => {
-    const { getByPlaceholderText } = render(<SignUp />);
+    const { getByPlaceholderText } = renderSignUp();
 
     const emailInput = getByPlaceholderText('example@domain.com');
     const passwordInput = getByPlaceholderText('Minimum 8 characters');
@@ -40,9 +61,9 @@ describe('SignUp Screen', () => {
     (validateEmail as jest.Mock).mockReturnValue('Invalid email');
     (validatePassword as jest.Mock).mockReturnValue('Password is too short');
 
-    const { getByText } = render(<SignUp />);
+    const { getByText } = renderSignUp();
 
-    fireEvent.press(getByText('Signup'));
+    fireEvent.press(getByText('SIGN UP'));
 
     expect(validateEmail).toHaveBeenCalledWith('');
     expect(validatePassword).toHaveBeenCalledWith('', true);
@@ -60,9 +81,9 @@ describe('SignUp Screen', () => {
       .mockReturnValueOnce('Password is too short')
       .mockReturnValueOnce('');
 
-    const { getByText, getByPlaceholderText, queryByText } = render(<SignUp />);
+    const { getByText, getByPlaceholderText, queryByText } = renderSignUp();
 
-    fireEvent.press(getByText('Signup'));
+    fireEvent.press(getByText('SIGN UP'));
 
     expect(getByText('Invalid email')).toBeTruthy();
     expect(getByText('Password is too short')).toBeTruthy();

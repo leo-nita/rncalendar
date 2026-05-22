@@ -1,12 +1,29 @@
 import { useState, useTransition } from 'react';
-import { StyleSheet, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { authService } from '../services/authService';
 import InputField from '../components/Input';
 import PrimaryButton from '../components/Button';
 import { validateEmail, validatePassword } from '../utils/validate';
 import { useAuth } from '../context/AuthContext';
+import { authInputStyles, authScreenStyles } from '../styles/authScreenStyles';
+
+type AuthStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+};
 
 const Login = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { completeCredentialLogin } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -47,44 +64,63 @@ const Login = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <InputField
-        label="Email"
-        placeholder="example@domain.com"
-        value={email}
-        onChangeText={handleEmailChange}
-        error={errors.email}
-      />
+    <KeyboardAvoidingView
+      style={authScreenStyles.screen}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={authScreenStyles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={authScreenStyles.card}>
+          <Text style={authScreenStyles.title}>LOGIN</Text>
+          <Text style={authScreenStyles.subtitle}>
+            Sign in to manage your calendar
+          </Text>
 
-      <InputField
-        label="Password"
-        placeholder="Minimum 8 characters"
-        secureTextEntry
-        value={password}
-        onChangeText={handlePasswordChange}
-        error={errors.password}
-      />
+          <InputField
+            label="Email"
+            placeholder="example@domain.com"
+            value={email}
+            onChangeText={handleEmailChange}
+            error={errors.email}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            {...authInputStyles}
+          />
 
-      <PrimaryButton
-        title="Login"
-        onPress={handleLogin}
-        loading={isPending}
-        textStyle={styles.buttonText}
-      />
-    </View>
+          <InputField
+            label="Password"
+            placeholder="Minimum 8 characters"
+            secureTextEntry
+            value={password}
+            onChangeText={handlePasswordChange}
+            error={errors.password}
+            {...authInputStyles}
+          />
+
+          <PrimaryButton
+            title="LOG IN"
+            onPress={handleLogin}
+            loading={isPending}
+            style={authScreenStyles.button}
+            textStyle={authScreenStyles.buttonText}
+          />
+
+          <Pressable
+            style={authScreenStyles.footer}
+            onPress={() => navigation.navigate('Signup')}
+          >
+            <Text style={authScreenStyles.footerText}>
+              Don&apos;t have an account?{' '}
+              <Text style={authScreenStyles.footerLink}>Sign up</Text>
+            </Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 export default Login;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  buttonText: {
-    letterSpacing: 0.5,
-  },
-});
