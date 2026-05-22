@@ -7,6 +7,9 @@ type InputFieldProps = {
   placeholder?: string;
   secureTextEntry?: boolean;
   error?: string;
+  maxLength?: number;
+  minLength?: number;
+  keyboardType?: 'numeric' | 'default';
 };
 
 const InputField = ({
@@ -16,16 +19,20 @@ const InputField = ({
   placeholder,
   secureTextEntry = false,
   error,
+  maxLength,
+  ...props
 }: InputFieldProps) => {
   return (
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label}</Text>
 
       <TextInput
+        {...props}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         secureTextEntry={secureTextEntry}
+        maxLength={maxLength}
         style={[styles.input, error && styles.inputError]}
       />
 
