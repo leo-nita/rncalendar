@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import SignUp from './Signup';
 import { validateEmail, validatePassword } from '../utils/validate';
 import { AuthProvider } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
 
 jest.mock('../utils/validate', () => ({
   validateEmail: jest.fn(),
@@ -25,9 +26,11 @@ jest.mock('../hooks/useBackgroundLock', () => ({
 const renderSignUp = () =>
   render(
     <AuthProvider>
-      <NavigationContainer>
-        <SignUp />
-      </NavigationContainer>
+      <ToastProvider>
+        <NavigationContainer>
+          <SignUp />
+        </NavigationContainer>
+      </ToastProvider>
     </AuthProvider>,
   );
 

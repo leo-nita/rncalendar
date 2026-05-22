@@ -15,6 +15,7 @@ import PrimaryButton from '../components/Button';
 import { validateEmail, validatePassword } from '../utils/validate';
 import { useAuth } from '../context/AuthContext';
 import { authInputStyles, authScreenStyles } from '../styles/authScreenStyles';
+import { useToast } from '../context/ToastContext';
 
 type AuthStackParamList = {
   Login: undefined;
@@ -25,6 +26,7 @@ const Login = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { completeCredentialLogin } = useAuth();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -56,9 +58,19 @@ const Login = () => {
     startTransition(async () => {
       try {
         await authService.login(email, password);
+        showToast({
+          type: 'success',
+          title: 'Login successful',
+          description: 'Welcome back.',
+        });
         completeCredentialLogin(email.trim());
-      } catch {
-        // Intercepted safely. Your service layer handles global visual error banners.
+      } catch (error) {
+        showToast({
+          type: 'error',
+          title: 'Login failed',
+          description:
+            error instanceof Error ? error.message : 'Unable to log in.',
+        });
       }
     });
   };

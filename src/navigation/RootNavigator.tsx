@@ -8,6 +8,7 @@ import Login from '../screens/Login';
 import SignUp from '../screens/Signup';
 import WelcomeBack from '../screens/WelcomeBack';
 import { getAuthNavigatorKey } from '../utils/authNavigation';
+import { ToastProvider } from '../context/ToastContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,9 +49,11 @@ function RootStack() {
 export default function RootNavigator() {
   return (
     <AuthProvider>
-      <NavigationContainer>
-        <RootStack />
-      </NavigationContainer>
+      <ToastProvider>
+        <NavigationContainer>
+          <RootStack />
+        </NavigationContainer>
+      </ToastProvider>
     </AuthProvider>
   );
 }

@@ -15,6 +15,9 @@ export const handleGlobalBackendError = (error: FirebaseErrors) => {
     case 'auth/invalid-email':
       backendMessage = 'The email format is invalid.';
       break;
+    case 'auth/invalid-credential':
+      backendMessage = 'Invalid email or password.';
+      break;
     case 'auth/weak-password':
       backendMessage = 'The password chosen is too weak.';
       break;

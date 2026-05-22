@@ -4,9 +4,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import PrimaryButton from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { biometricService } from '../services/biometricService';
+import { useToast } from '../context/ToastContext';
 
 const WelcomeBack = () => {
   const { userEmail, completeBiometricUnlock, goToPasswordLogin } = useAuth();
+  const { showToast } = useToast();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const didAutoPromptRef = useRef(false);
 
@@ -18,11 +20,17 @@ const WelcomeBack = () => {
 
       if (result.success) {
         completeBiometricUnlock();
+      } else if (!result.isUserCancelled) {
+        showToast({
+          type: 'error',
+          title: 'Biometric unlock failed',
+          description: result.error || 'Unable to unlock with biometrics.',
+        });
       }
     } finally {
       setIsAuthenticating(false);
     }
-  }, [completeBiometricUnlock]);
+  }, [completeBiometricUnlock, showToast]);
 
   useFocusEffect(
     useCallback(() => {

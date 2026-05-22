@@ -15,6 +15,7 @@ import PrimaryButton from '../components/Button';
 import { validateEmail, validatePassword } from '../utils/validate';
 import { useAuth } from '../context/AuthContext';
 import { authInputStyles, authScreenStyles } from '../styles/authScreenStyles';
+import { useToast } from '../context/ToastContext';
 
 type AuthStackParamList = {
   Login: undefined;
@@ -25,6 +26,7 @@ const SignUp = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { completeCredentialLogin } = useAuth();
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -59,9 +61,19 @@ const SignUp = () => {
     startTransition(async () => {
       try {
         await authService.signUp(email, password);
+        showToast({
+          type: 'success',
+          title: 'Account created',
+          description: 'You are now signed in.',
+        });
         completeCredentialLogin(email.trim());
-      } catch {
-        // Errors are surfaced by authService.
+      } catch (error) {
+        showToast({
+          type: 'error',
+          title: 'Signup failed',
+          description:
+            error instanceof Error ? error.message : 'Unable to sign up.',
+        });
       }
     });
   };

@@ -9,4 +9,5 @@ export const theme = {
   textMuted: '#7a8290',
   placeholder: '#5a6478',
   error: '#ff6b6b',
+  success: '#2f9e44',
 } as const;
