@@ -4,8 +4,10 @@ import { authService } from '../services/authService';
 import InputField from '../components/Input';
 import PrimaryButton from '../components/Button';
 import { validateEmail, validatePassword } from '../utils/validate';
+import { useAuth } from '../context/AuthContext';
 
 const SignUp = () => {
+  const { completeCredentialLogin } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -37,7 +39,12 @@ const SignUp = () => {
     setErrors({ email: '', password: '' });
 
     startTransition(async () => {
-      await authService.signUp(email, password);
+      try {
+        await authService.signUp(email, password);
+        completeCredentialLogin(email.trim());
+      } catch {
+        // Errors are surfaced by authService.
+      }
     });
   };
 

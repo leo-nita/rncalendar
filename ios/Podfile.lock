@@ -1950,6 +1950,28 @@ PODS:
     - React-perflogger (= 0.85.3)
     - React-utils (= 0.85.3)
     - ReactNativeDependencies
+  - ReactNativeBiometrics (0.15.0):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - ReactNativeDependencies (0.85.3)
   - RecaptchaInterop (101.0.0)
   - RNFBApp (24.0.0):
@@ -2125,6 +2147,7 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios/ReactAppDependencyProvider`)
   - ReactCodegen (from `build/generated/ios/ReactCodegen`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "ReactNativeBiometrics (from `../node_modules/@sbaiahmed1/react-native-biometrics`)"
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
@@ -2297,6 +2320,8 @@ EXTERNAL SOURCES:
     :path: build/generated/ios/ReactCodegen
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  ReactNativeBiometrics:
+    :path: "../node_modules/@sbaiahmed1/react-native-biometrics"
   ReactNativeDependencies:
     :podspec: "../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec"
   RNFBApp:
@@ -2394,6 +2419,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 25c9c516839be2c5e3d3344f95dc7da5f7e63fc2
   ReactCodegen: 7016a2114079361a2f1536b3c91a15ceb8eb7ca4
   ReactCommon: 7dfc3250793bf36cf221096ff59e1179e13eef7f
+  ReactNativeBiometrics: 1fb6ad206cfd39900e952b1abcdcdba22bdd6fd9
   ReactNativeDependencies: ad73a03af400e17f099b10b3fceefb9d55013134
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   RNFBApp: 3b942e786ca88524ba17df665a1a360fb3eee525

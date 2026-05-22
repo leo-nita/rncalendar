@@ -7,7 +7,7 @@ import { validateEmail, validatePassword } from '../utils/validate';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-  const { setIsAuthenticated, setUserEmail } = useAuth();
+  const { completeCredentialLogin } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,8 +39,7 @@ const Login = () => {
     startTransition(async () => {
       try {
         await authService.login(email, password);
-        setUserEmail(email.trim());
-        setIsAuthenticated(true);
+        completeCredentialLogin(email.trim());
       } catch {
         // Intercepted safely. Your service layer handles global visual error banners.
       }
