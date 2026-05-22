@@ -1,5 +1,11 @@
 // utils/validate.js
 
+import {
+  MAX_HOUR,
+  MAX_MINUTE,
+  TIME_INPUT_MAX_LENGTH,
+} from '../constants/event';
+
 export const validateEmail = (email: string) => {
   if (!email || email.trim() === '') {
     return 'Email is required';
@@ -23,4 +29,30 @@ export const validatePassword = (password: string, isSignUp = false) => {
   }
 
   return '';
+};
+
+export const validateHour = (hour: string) => {
+  const digitsOnly = hour.replace(/\D/g, '').slice(0, TIME_INPUT_MAX_LENGTH);
+  if (digitsOnly === '') {
+    return '';
+  }
+
+  if (Number(digitsOnly) > MAX_HOUR) {
+    return digitsOnly.slice(0, -1);
+  }
+
+  return digitsOnly;
+};
+
+export const validateMinute = (minute: string) => {
+  const digitsOnly = minute.replace(/\D/g, '').slice(0, TIME_INPUT_MAX_LENGTH);
+  if (digitsOnly === '') {
+    return '';
+  }
+
+  if (Number(digitsOnly) > MAX_MINUTE) {
+    return digitsOnly.slice(0, -1);
+  }
+
+  return digitsOnly;
 };

@@ -1,7 +1,8 @@
 import { useState, useTransition } from 'react';
-import { Button, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { authService } from '../services/authService';
 import InputField from '../components/Input';
+import PrimaryButton from '../components/Button';
 import { validateEmail, validatePassword } from '../utils/validate';
 import { useAuth } from '../context/AuthContext';
 
@@ -65,11 +66,12 @@ const Login = () => {
         error={errors.password}
       />
 
-      {isPending ? (
-        <ActivityIndicator size="small" color="#0000ff" style={styles.loader} />
-      ) : (
-        <Button title="Login" onPress={handleLogin} />
-      )}
+      <PrimaryButton
+        title="Login"
+        onPress={handleLogin}
+        loading={isPending}
+        textStyle={styles.buttonText}
+      />
     </View>
   );
 };
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
   },
-  loader: {
-    marginVertical: 10,
+  buttonText: {
+    letterSpacing: 0.5,
   },
 });

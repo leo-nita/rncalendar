@@ -1,39 +1,43 @@
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TextInputProps,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 
 type InputFieldProps = {
-  label: string;
+  label?: string;
   value: string;
   onChangeText: (text: string) => void;
-  placeholder?: string;
-  secureTextEntry?: boolean;
   error?: string;
-  maxLength?: number;
-  minLength?: number;
-  keyboardType?: 'numeric' | 'default';
-};
+  inputStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+} & Omit<TextInputProps, 'value' | 'onChangeText' | 'style'>;
 
 const InputField = ({
   label,
   value,
   onChangeText,
-  placeholder,
-  secureTextEntry = false,
   error,
-  maxLength,
+  inputStyle,
+  containerStyle,
+  labelStyle,
   ...props
 }: InputFieldProps) => {
   return (
-    <View style={styles.inputContainer}>
-      <Text style={styles.label}>{label}</Text>
+    <View style={[styles.inputContainer, containerStyle]}>
+      {label ? <Text style={[styles.label, labelStyle]}>{label}</Text> : null}
 
       <TextInput
         {...props}
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
-        secureTextEntry={secureTextEntry}
-        maxLength={maxLength}
-        style={[styles.input, error && styles.inputError]}
+        style={[styles.input, error && styles.inputError, inputStyle]}
       />
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}

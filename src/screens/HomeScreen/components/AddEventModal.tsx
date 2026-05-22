@@ -3,12 +3,18 @@ import {
   Modal,
   View,
   Text,
-  TextInput,
   Pressable,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import InputField from '../../../components/Input';
+import PrimaryButton from '../../../components/Button';
+import { validateHour, validateMinute } from '../../../utils/validate';
+import {
+  MAX_EVENT_LENGTH,
+  TIME_INPUT_MAX_LENGTH,
+} from '../../../constants/event';
 
 type AddEventModalProps = {
   visible: boolean;
@@ -20,8 +26,6 @@ type AddEventModalProps = {
   }) => void;
 };
 
-const MAX_EVENT_LENGTH = 60;
-
 function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
   const [hour, setHour] = useState('');
   const [minute, setMinute] = useState('');
@@ -31,6 +35,14 @@ function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
     setHour('');
     setMinute('');
     setDetails('');
+  };
+
+  const handleHourChange = (text: string) => {
+    setHour(validateHour(text));
+  };
+
+  const handleMinuteChange = (text: string) => {
+    setMinute(validateMinute(text));
   };
 
   const handleClose = () => {
@@ -74,31 +86,32 @@ function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
                 <Text style={styles.timeLabelText}>TIME</Text>
               </View>
               <View style={styles.timeInputs}>
-                <TextInput
-                  style={styles.timeInput}
+                <InputField
                   value={hour}
-                  onChangeText={setHour}
+                  onChangeText={handleHourChange}
                   keyboardType="numeric"
-                  maxLength={2}
+                  maxLength={TIME_INPUT_MAX_LENGTH}
                   placeholder="00"
                   placeholderTextColor="#5a6478"
                   selectionColor="#4A90E2"
+                  containerStyle={styles.timeInputContainer}
+                  inputStyle={styles.timeInput}
                 />
-                <TextInput
-                  style={styles.timeInput}
+                <InputField
                   value={minute}
-                  onChangeText={setMinute}
+                  onChangeText={handleMinuteChange}
                   keyboardType="numeric"
-                  maxLength={2}
+                  maxLength={TIME_INPUT_MAX_LENGTH}
                   placeholder="00"
                   placeholderTextColor="#5a6478"
                   selectionColor="#4A90E2"
+                  containerStyle={styles.timeInputContainer}
+                  inputStyle={styles.timeInput}
                 />
               </View>
             </View>
 
-            <TextInput
-              style={styles.detailsInput}
+            <InputField
               value={details}
               onChangeText={setDetails}
               placeholder="Enter Event Text (Maximum 60 Characters)"
@@ -107,11 +120,11 @@ function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
               multiline
               textAlignVertical="top"
               selectionColor="#4A90E2"
+              containerStyle={styles.detailsContainer}
+              inputStyle={styles.detailsInput}
             />
 
-            <Pressable style={styles.addButton} onPress={handleAddEvent}>
-              <Text style={styles.addButtonText}>ADD EVENT</Text>
-            </Pressable>
+            <PrimaryButton title="ADD EVENT" onPress={handleAddEvent} />
           </View>
         </KeyboardAvoidingView>
       </View>
@@ -184,36 +197,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 20,
   },
-  timeInput: {
+  timeInputContainer: {
     flex: 1,
+    marginBottom: 0,
+  },
+  timeInput: {
+    borderWidth: 0,
+    marginTop: 0,
+    padding: 0,
+    paddingVertical: 8,
     fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
-    paddingVertical: 8,
     borderTopWidth: 2,
     borderBottomWidth: 2,
     borderTopColor: '#4A90E2',
     borderBottomColor: '#4A90E2',
+    borderRadius: 0,
     textAlign: 'center',
   },
+  detailsContainer: {
+    marginBottom: 24,
+  },
   detailsInput: {
+    borderWidth: 0,
+    marginTop: 0,
     backgroundColor: '#12151a',
     borderRadius: 6,
     minHeight: 120,
     padding: 14,
     fontSize: 13,
     color: '#ffffff',
-    marginBottom: 24,
-  },
-  addButton: {
-    backgroundColor: '#F5A623',
-    paddingVertical: 16,
-    borderRadius: 4,
-  },
-  addButtonText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#ffffff',
-    letterSpacing: 1.5,
   },
 });

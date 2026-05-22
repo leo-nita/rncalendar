@@ -2,22 +2,8 @@ import React, { useReducer, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import AddEventModal from './HomeScreen/components/AddEventModal';
-
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+import PrimaryButton from '../components/Button';
+import { MONTHS, WEEKDAYS } from '../constants/calendar';
 
 type CalendarState = {
   month: number;
@@ -170,12 +156,12 @@ function HomeScreen() {
           })}
         </View>
       </View>
-      <Pressable
-        style={styles.addEventTrigger}
+      <PrimaryButton
+        title="ADD EVENT"
         onPress={() => setShowAddEventModal(true)}
-      >
-        <Text style={styles.addEventTriggerText}>ADD EVENT</Text>
-      </Pressable>
+        style={styles.addEventTrigger}
+        textStyle={styles.addEventTriggerText}
+      />
 
       <AddEventModal
         visible={showAddEventModal}
@@ -299,7 +285,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8871a',
     paddingVertical: 14,
     borderRadius: 8,
-    alignItems: 'center',
   },
   addEventTriggerText: {
     fontSize: 14,
