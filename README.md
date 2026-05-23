@@ -2,6 +2,36 @@
 
 A React Native calendar app with Firebase authentication and Firestore event storage.
 
+## Screenshots
+
+### Authentication
+
+**Login**
+
+![Login screen](sc/702945722_1733608667802833_9205302584928568717_n.jpg)
+
+**Face ID permission (iOS)**
+
+![Face ID permission prompt](sc/702619494_27138938659126900_4173598623200580790_n.jpg)
+
+**Biometric unlock on return**
+
+![Face ID unlock](sc/705963831_4181630408647133_5800974350724255758_n.jpg)
+
+### Calendar
+
+**Home screen after login**
+
+![Calendar home screen](sc/703154572_949578377898508_8412649060088195505_n.jpg)
+
+**Add event**
+
+![Add event modal](sc/704557686_1935827057137850_6583513051799580389_n.jpg)
+
+**Edit event**
+
+![Edit event modal](sc/705890488_990037850248251_8349964074758464489_n.jpg)
+
 ## Prerequisites
 
 Before running the app, set up your development environment using the [React Native environment setup guide](https://reactnative.dev/docs/set-up-your-environment).
