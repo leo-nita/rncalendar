@@ -1,9 +1,10 @@
 import React, { useReducer, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useAuth } from '../context/AuthContext';
 import AddEventModal from './HomeScreen/components/AddEventModal';
 import PrimaryButton from '../components/Button';
+import ScreenContainer from '../components/ScreenContainer';
 import { MONTHS, WEEKDAYS } from '../constants/calendar';
+import { theme } from '../constants/theme';
 
 type CalendarState = {
   month: number;
@@ -53,7 +54,6 @@ function calendarReducer(
 }
 
 function HomeScreen() {
-  const { userEmail } = useAuth();
   const currentDate = new Date();
 
   const [showAddEventModal, setShowAddEventModal] = useState(false);
@@ -96,9 +96,7 @@ function HomeScreen() {
   };
 
   return (
-    <View style={styles.screen}>
-      <Text>Welcome : {userEmail}</Text>
-
+    <ScreenContainer scrollable>
       <View style={styles.calendarCard}>
         <Text style={styles.calendarTitle}>CALENDAR</Text>
 
@@ -177,25 +175,17 @@ function HomeScreen() {
           <Text style={styles.eventDetails}>{event.details}</Text>
         </View>
       ))}
-    </View>
+    </ScreenContainer>
   );
 }
 export default HomeScreen;
 const CELL_WIDTH = `${100 / 7}%`;
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-    padding: 16,
-    backgroundColor: '#0f1117',
-  },
   calendarCard: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: '#1e222d',
+    backgroundColor: theme.card,
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -204,7 +194,7 @@ const styles = StyleSheet.create({
   calendarTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#ffffff',
+    color: theme.textPrimary,
     letterSpacing: 1,
     marginBottom: 16,
   },
@@ -221,7 +211,7 @@ const styles = StyleSheet.create({
   monthText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#c8cdd6',
+    color: theme.textSecondary,
   },
   navButtons: {
     flexDirection: 'row',
@@ -231,14 +221,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#2a2f3a',
+    backgroundColor: theme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   navArrow: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#e8871a',
+    color: theme.accent,
     lineHeight: 20,
   },
   weekdays: {
@@ -258,38 +248,38 @@ const styles = StyleSheet.create({
   weekdayText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#7a8290',
+    color: theme.textMuted,
     letterSpacing: 0.5,
   },
   dayText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#ffffff',
+    color: theme.textPrimary,
   },
   selectedDay: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#e8871a',
+    backgroundColor: theme.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectedDayText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#ffffff',
+    color: theme.textPrimary,
   },
   addEventTrigger: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: '#e8871a',
+    backgroundColor: theme.accent,
     paddingVertical: 14,
     borderRadius: 8,
   },
   addEventTriggerText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#ffffff',
+    color: theme.textPrimary,
     letterSpacing: 1.2,
   },
   eventItem: {
@@ -298,18 +288,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#1e222d',
+    backgroundColor: theme.card,
     borderRadius: 8,
     padding: 12,
   },
   eventTime: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#e8871a',
+    color: theme.accent,
   },
   eventDetails: {
     flex: 1,
     fontSize: 14,
-    color: '#ffffff',
+    color: theme.textPrimary,
   },
 });
