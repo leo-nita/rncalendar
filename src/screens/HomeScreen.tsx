@@ -1,10 +1,12 @@
-import React, { useReducer, useState } from 'react';
+import React, { useCallback, useReducer, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import AddEventModal from './HomeScreen/components/AddEventModal';
+import EventList from './HomeScreen/components/EventList';
 import PrimaryButton from '../components/Button';
 import ScreenContainer from '../components/ScreenContainer';
 import { MONTHS, WEEKDAYS } from '../constants/calendar';
 import { theme } from '../constants/theme';
+import { CalendarEvent } from '../types/event';
 
 type CalendarState = {
   month: number;
@@ -12,14 +14,6 @@ type CalendarState = {
 };
 
 type CalendarAction = { type: 'PREV_MONTH' } | { type: 'NEXT_MONTH' };
-
-type CalendarEvent = {
-  id: string;
-  date: Date;
-  hour: string;
-  minute: string;
-  details: string;
-};
 
 function getInitialCalendarState(): CalendarState {
   const now = new Date();
@@ -95,8 +89,16 @@ function HomeScreen() {
     ]);
   };
 
-  return (
-    <ScreenContainer scrollable>
+  const handleDeleteEvent = useCallback((event: CalendarEvent) => {
+    setEvents(prev => prev.filter(item => item.id !== event.id));
+  }, []);
+
+  const handleEditEvent = useCallback(() => {
+    // Edit flow will be wired in a follow-up task.
+  }, []);
+
+  const listHeader = (
+    <View style={styles.listHeader}>
       <View style={styles.calendarCard}>
         <Text style={styles.calendarTitle}>CALENDAR</Text>
 
@@ -160,21 +162,23 @@ function HomeScreen() {
         style={styles.addEventTrigger}
         textStyle={styles.addEventTriggerText}
       />
+    </View>
+  );
+
+  return (
+    <ScreenContainer contentStyle={styles.screen}>
+      <EventList
+        events={events}
+        onEdit={handleEditEvent}
+        onDelete={handleDeleteEvent}
+        ListHeaderComponent={listHeader}
+      />
 
       <AddEventModal
         visible={showAddEventModal}
         onClose={() => setShowAddEventModal(false)}
         onAddEvent={handleAddEvent}
       />
-
-      {events.map(event => (
-        <View key={event.id} style={styles.eventItem}>
-          <Text style={styles.eventTime}>
-            {event.hour.padStart(2, '0')}:{event.minute.padStart(2, '0')}
-          </Text>
-          <Text style={styles.eventDetails}>{event.details}</Text>
-        </View>
-      ))}
     </ScreenContainer>
   );
 }
@@ -182,6 +186,20 @@ export default HomeScreen;
 const CELL_WIDTH = `${100 / 7}%`;
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'stretch',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 0,
+  },
+  listHeader: {
+    width: '100%',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 16,
+  },
   calendarCard: {
     width: '100%',
     maxWidth: 340,
@@ -281,25 +299,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.textPrimary,
     letterSpacing: 1.2,
-  },
-  eventItem: {
-    width: '100%',
-    maxWidth: 340,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: theme.card,
-    borderRadius: 8,
-    padding: 12,
-  },
-  eventTime: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.accent,
-  },
-  eventDetails: {
-    flex: 1,
-    fontSize: 14,
-    color: theme.textPrimary,
   },
 });
