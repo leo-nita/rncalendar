@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -15,6 +15,7 @@ import {
   MAX_EVENT_LENGTH,
   TIME_INPUT_MAX_LENGTH,
 } from '../../../constants/event';
+import { CalendarEvent } from '../../../types/event';
 
 type AddEventModalProps = {
   visible: boolean;
@@ -23,13 +24,37 @@ type AddEventModalProps = {
     hour: string;
     minute: string;
     details: string;
-  }) => void;
+  }) => void | Promise<void>;
+  initialEvent?: CalendarEvent | null;
 };
 
-function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
+function AddEventModal({
+  visible,
+  onClose,
+  onAddEvent,
+  initialEvent = null,
+}: AddEventModalProps) {
   const [hour, setHour] = useState('');
   const [minute, setMinute] = useState('');
   const [details, setDetails] = useState('');
+  const isEditing = initialEvent !== null;
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
+    if (initialEvent) {
+      setHour(initialEvent.hour);
+      setMinute(initialEvent.minute);
+      setDetails(initialEvent.details);
+      return;
+    }
+
+    setHour('');
+    setMinute('');
+    setDetails('');
+  }, [initialEvent, visible]);
 
   const resetForm = () => {
     setHour('');
@@ -50,10 +75,14 @@ function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
     onClose();
   };
 
-  const handleAddEvent = () => {
-    onAddEvent?.({ hour, minute, details });
-    resetForm();
-    onClose();
+  const handleAddEvent = async () => {
+    try {
+      await onAddEvent?.({ hour, minute, details });
+      resetForm();
+      onClose();
+    } catch {
+      // Keep the modal open so the user can retry.
+    }
   };
 
   return (
@@ -71,7 +100,9 @@ function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
         >
           <View style={styles.dialog}>
             <View style={styles.header}>
-              <Text style={styles.title}>Add Event</Text>
+              <Text style={styles.title}>
+                {isEditing ? 'Edit Event' : 'Add Event'}
+              </Text>
               <Pressable
                 style={styles.closeButton}
                 onPress={handleClose}
@@ -124,7 +155,10 @@ function AddEventModal({ visible, onClose, onAddEvent }: AddEventModalProps) {
               inputStyle={styles.detailsInput}
             />
 
-            <PrimaryButton title="ADD EVENT" onPress={handleAddEvent} />
+            <PrimaryButton
+              title={isEditing ? 'SAVE EVENT' : 'ADD EVENT'}
+              onPress={handleAddEvent}
+            />
           </View>
         </KeyboardAvoidingView>
       </View>

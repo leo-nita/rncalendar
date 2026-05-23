@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#00A3FF',
     borderRadius: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     minHeight: 60,
   },
   timeSection: {

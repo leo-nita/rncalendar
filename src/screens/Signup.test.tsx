@@ -40,11 +40,11 @@ describe('SignUp Screen', () => {
   });
 
   it('renders all fields and signup button', () => {
-    const { getByPlaceholderText, getByText } = renderSignUp();
+    const { getByPlaceholderText, getAllByText } = renderSignUp();
 
     expect(getByPlaceholderText('example@domain.com')).toBeTruthy();
     expect(getByPlaceholderText('Minimum 8 characters')).toBeTruthy();
-    expect(getByText('SIGN UP')).toBeTruthy();
+    expect(getAllByText('SIGN UP')).toHaveLength(2);
   });
 
   it('updates input values correctly', () => {
@@ -64,9 +64,9 @@ describe('SignUp Screen', () => {
     (validateEmail as jest.Mock).mockReturnValue('Invalid email');
     (validatePassword as jest.Mock).mockReturnValue('Password is too short');
 
-    const { getByText } = renderSignUp();
+    const { getAllByText, getByText } = renderSignUp();
 
-    fireEvent.press(getByText('SIGN UP'));
+    fireEvent.press(getAllByText('SIGN UP')[1]);
 
     expect(validateEmail).toHaveBeenCalledWith('');
     expect(validatePassword).toHaveBeenCalledWith('', true);
@@ -84,9 +84,10 @@ describe('SignUp Screen', () => {
       .mockReturnValueOnce('Password is too short')
       .mockReturnValueOnce('');
 
-    const { getByText, getByPlaceholderText, queryByText } = renderSignUp();
+    const { getAllByText, getByText, getByPlaceholderText, queryByText } =
+      renderSignUp();
 
-    fireEvent.press(getByText('SIGN UP'));
+    fireEvent.press(getAllByText('SIGN UP')[1]);
 
     expect(getByText('Invalid email')).toBeTruthy();
     expect(getByText('Password is too short')).toBeTruthy();

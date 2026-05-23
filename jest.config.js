@@ -3,7 +3,7 @@ module.exports = {
   // Points to the setup file in your root folder
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transformIgnorePatterns: [
-    // This regex pattern forces Jest to process both react-native and react-native-firebase files
-    'node_modules/(?!(jest-)?react-native|@react-native|@react-native-firebase)',
+    // Force Jest to transform ESM packages that ship untranspiled module syntax
+    'node_modules/(?!(jest-)?react-native|@react-native|@react-native-firebase|@react-navigation|react-native-screens|react-native-safe-area-context)',
   ],
 };
