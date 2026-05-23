@@ -76,6 +76,30 @@ npm run android
 
 You can also open `ios/RNCalendarApp.xcworkspace` in Xcode or the `android` folder in Android Studio and run from there.
 
+## Using the app
+
+### 1. Create an account
+
+When the app launches, you will see the login screen.
+
+1. Tap **Sign up** to open the signup screen.
+2. Enter your email and a password (minimum 8 characters).
+3. Tap **SIGN UP**.
+
+After your account is created, you are signed in automatically and taken to the home screen.
+
+If you already have an account, tap **Log in** on the signup screen and sign in with your email and password.
+
+### 2. Create an event
+
+Once you are signed in, you can add calendar events from the home screen:
+
+1. Tap a date on the calendar, **or** tap the **ADD EVENT** button.
+2. Enter the event time and details in the modal.
+3. Save the event — it will appear in your event list and is stored in Firestore for your account.
+
+You can also edit or delete events from the event list.
+
 ## Other scripts
 
 ```sh

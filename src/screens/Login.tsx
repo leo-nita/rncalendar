@@ -1,4 +1,4 @@
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -31,8 +31,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
-
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -44,7 +43,7 @@ const Login = () => {
     if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password, false);
 
@@ -54,25 +53,26 @@ const Login = () => {
     }
 
     setErrors({ email: '', password: '' });
+    setIsSubmitting(true);
 
-    startTransition(async () => {
-      try {
-        await authService.login(email, password);
-        showToast({
-          type: 'success',
-          title: 'Login successful',
-          description: 'Welcome back.',
-        });
-        completeCredentialLogin(email.trim());
-      } catch (error) {
-        showToast({
-          type: 'error',
-          title: 'Login failed',
-          description:
-            error instanceof Error ? error.message : 'Unable to log in.',
-        });
-      }
-    });
+    try {
+      await authService.login(email, password);
+      showToast({
+        type: 'success',
+        title: 'Login successful',
+        description: 'Welcome back.',
+      });
+      completeCredentialLogin(email.trim());
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Login failed',
+        description:
+          error instanceof Error ? error.message : 'Unable to log in.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -115,7 +115,7 @@ const Login = () => {
           <PrimaryButton
             title="LOG IN"
             onPress={handleLogin}
-            loading={isPending}
+            loading={isSubmitting}
             style={authScreenStyles.button}
             textStyle={authScreenStyles.buttonText}
           />

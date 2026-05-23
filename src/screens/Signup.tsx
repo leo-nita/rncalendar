@@ -1,4 +1,4 @@
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -34,8 +34,7 @@ const SignUp = () => {
     email: '',
     password: '',
   });
-
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -47,7 +46,7 @@ const SignUp = () => {
     if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password, true);
 
@@ -57,25 +56,26 @@ const SignUp = () => {
     }
 
     setErrors({ email: '', password: '' });
+    setIsSubmitting(true);
 
-    startTransition(async () => {
-      try {
-        await authService.signUp(email, password);
-        showToast({
-          type: 'success',
-          title: 'Account created',
-          description: 'You are now signed in.',
-        });
-        completeCredentialLogin(email.trim());
-      } catch (error) {
-        showToast({
-          type: 'error',
-          title: 'Signup failed',
-          description:
-            error instanceof Error ? error.message : 'Unable to sign up.',
-        });
-      }
-    });
+    try {
+      await authService.signUp(email, password);
+      showToast({
+        type: 'success',
+        title: 'Account created',
+        description: 'You are now signed in.',
+      });
+      completeCredentialLogin(email.trim());
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Signup failed',
+        description:
+          error instanceof Error ? error.message : 'Unable to sign up.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -118,7 +118,7 @@ const SignUp = () => {
           <PrimaryButton
             title="SIGN UP"
             onPress={handleSignup}
-            loading={isPending}
+            loading={isSubmitting}
             style={authScreenStyles.button}
             textStyle={authScreenStyles.buttonText}
           />
