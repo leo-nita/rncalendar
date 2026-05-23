@@ -1,5 +1,4 @@
 export const AUTH_STORAGE_KEYS = {
-  token: 'userToken',
   email: 'userEmail',
   biometricEnabled: 'isBiometricEnabled',
 } as const;

@@ -26,8 +26,16 @@ jest.mock('@react-native-firebase/auth', () => {
         user: mockCurrentUser,
       }),
     ),
-    signInWithEmailAndPassword: jest.fn(() => Promise.resolve({})),
+    signInWithEmailAndPassword: jest.fn(() =>
+      Promise.resolve({
+        user: mockCurrentUser,
+      }),
+    ),
     signOut: jest.fn(() => Promise.resolve({})),
+    onAuthStateChanged: jest.fn(callback => {
+      callback(null);
+      return jest.fn();
+    }),
   };
 
   return () => authInstance;

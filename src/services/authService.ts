@@ -29,12 +29,6 @@ export const handleGlobalBackendError = (error: FirebaseErrors) => {
   return backendMessage;
 };
 
-const saveAuthSession = async (user: FirebaseAuthTypes.User, email: string) => {
-  const token = await user.getIdToken();
-  sessionStorage.persistSession(token, email);
-  return { user, token };
-};
-
 export const authService = {
   signUp: async (email: string, password: string) => {
     try {
@@ -42,7 +36,8 @@ export const authService = {
         email.trim(),
         password,
       );
-      return saveAuthSession(userCredential.user, email);
+      sessionStorage.persistEmail(email);
+      return { user: userCredential.user };
     } catch (error) {
       const msg = handleGlobalBackendError(error as FirebaseErrors);
       throw new Error(msg);
@@ -55,7 +50,8 @@ export const authService = {
         email.trim(),
         password,
       );
-      return saveAuthSession(userCredential.user, email);
+      sessionStorage.persistEmail(email);
+      return { user: userCredential.user };
     } catch (error) {
       const msg = handleGlobalBackendError(error as FirebaseErrors);
       throw new Error(msg);

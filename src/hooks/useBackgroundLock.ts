@@ -1,5 +1,6 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
+import auth from '@react-native-firebase/auth';
 import { BACKGROUND_LOCK_TIMEOUT_MS } from '../constants/authStorage';
 import { sessionStorage } from '../services/sessionStorage';
 
@@ -48,7 +49,7 @@ export const useBackgroundLock = ({
 
         const shouldLock =
           isAuthenticatedRef.current &&
-          sessionStorage.getSession() !== null &&
+          auth().currentUser !== null &&
           sessionStorage.isBiometricGateEnabled() &&
           elapsed >= timeoutMs;
 

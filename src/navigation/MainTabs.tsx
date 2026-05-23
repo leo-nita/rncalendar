@@ -14,7 +14,11 @@ const TAB_TITLES: Record<string, string> = {
   Profile: 'Profile',
 };
 
-function TabBarIcon({ label, color }: { label: string; color: string }) {
+type TabBarIconProps = {
+  label: string;
+  color: string;
+};
+function TabBarIcon({ label, color }: TabBarIconProps) {
   const symbol = label === 'Calendar' ? '▦' : '◎';
 
   return <Text style={[styles.tabIcon, { color }]}>{symbol}</Text>;

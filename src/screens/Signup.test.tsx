@@ -13,9 +13,13 @@ jest.mock('../utils/validate', () => ({
 
 jest.mock('../services/sessionStorage', () => ({
   sessionStorage: {
-    getSession: jest.fn(() => null),
+    getEmail: jest.fn(() => undefined),
+    persistEmail: jest.fn(),
     ensureBiometricPreference: jest.fn(),
     isBiometricGateEnabled: jest.fn(() => false),
+    enableBiometric: jest.fn(),
+    disableBiometric: jest.fn(),
+    clearSession: jest.fn(),
   },
 }));
 

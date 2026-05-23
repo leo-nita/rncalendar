@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
+import auth from '@react-native-firebase/auth';
 import { authService } from '../services/authService';
 import { sessionStorage } from '../services/sessionStorage';
 import { useBackgroundLock } from '../hooks/useBackgroundLock';
@@ -58,10 +59,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   useEffect(() => {
-    const session = sessionStorage.getSession();
+    // Synchronous: read cached email for instant cold-start navigation
+    const cachedEmail = sessionStorage.getEmail();
 
-    if (session) {
-      setUserEmail(session.email);
+    if (cachedEmail) {
+      setUserEmail(cachedEmail);
       sessionStorage.ensureBiometricPreference();
 
       if (sessionStorage.isBiometricGateEnabled()) {
@@ -72,12 +74,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     setIsLoading(false);
+
+    // Async: Firebase validates the session in background
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      if (!user) {
+        // Only act if there's a cached email — means session expired/revoked,
+        // not a normal logout (logout clears MMKV before Firebase fires)
+        const currentEmail = sessionStorage.getEmail();
+        if (currentEmail) {
+          sessionStorage.clearSession();
+          setUserEmail(null);
+          resetToLogin();
+        }
+      } else {
+        // Firebase is always authoritative for the email value
+        setUserEmail(user.email ?? null);
+      }
+    });
+
+    return unsubscribe;
   }, [lockForBiometric, resetToLogin]);
 
   const completeCredentialLogin = useCallback((email: string) => {
     setUserEmail(email);
     setRequiresBiometricUnlock(false);
     setIsAuthenticated(true);
+    sessionStorage.enableBiometric();
   }, []);
 
   const completeBiometricUnlock = useCallback(() => {

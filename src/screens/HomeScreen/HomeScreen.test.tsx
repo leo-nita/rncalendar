@@ -1,16 +1,16 @@
 import React from 'react';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import HomeScreen from './HomeScreen';
-import { eventService } from '../services/eventService';
-import { CalendarEvent } from '../types/event';
+import { eventService } from '../../services/eventService';
+import { CalendarEvent } from '../../types/event';
 
 const mockShowToast = jest.fn();
 
-jest.mock('../context/ToastContext', () => ({
+jest.mock('../../context/ToastContext', () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }));
 
-jest.mock('../services/eventService', () => ({
+jest.mock('../../services/eventService', () => ({
   eventService: {
     subscribeToEvents: jest.fn(),
     createEvent: jest.fn(),

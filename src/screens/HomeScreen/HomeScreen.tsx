@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import AddEventModal from './HomeScreen/components/AddEventModal';
-import Calendar from './HomeScreen/components/Calendar';
-import EventList from './HomeScreen/components/EventList';
-import PrimaryButton from '../components/Button';
-import ScreenContainer from '../components/ScreenContainer';
-import { useToast } from '../context/ToastContext';
-import { theme } from '../constants/theme';
-import { eventService } from '../services/eventService';
-import { CalendarEvent } from '../types/event';
+import AddEventModal from './components/AddEventModal';
+import Calendar from './components/Calendar';
+import EventList from './components/EventList';
+import PrimaryButton from '../../components/Button';
+import ScreenContainer from '../../components/ScreenContainer';
+import { useToast } from '../../context/ToastContext';
+import { theme } from '../../constants/theme';
+import { eventService } from '../../services/eventService';
+import { CalendarEvent } from '../../types/event';
 
 function HomeScreen() {
   const currentDate = new Date();
