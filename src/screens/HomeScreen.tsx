@@ -40,7 +40,10 @@ function HomeScreen() {
     async (event: { hour: string; minute: string; details: string }) => {
       try {
         if (editingEvent) {
-          await eventService.updateEvent(editingEvent.id, event);
+          await eventService.updateEvent(editingEvent.id, {
+            date: selectedDate,
+            ...event,
+          });
         } else {
           await eventService.createEvent({
             date: selectedDate,

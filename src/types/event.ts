@@ -13,4 +13,6 @@ export type CreateEventInput = {
   details: string;
 };
 
-export type UpdateEventInput = Partial<CreateEventInput>;
+export type UpdateEventInput = {
+  date: Date;
+} & Partial<Omit<CreateEventInput, 'date'>>;

@@ -19,7 +19,7 @@ jest.mock('react-native-mmkv', () => ({
 jest.mock('@react-native-firebase/auth', () => {
   const mockCurrentUser = { uid: 'mock-user-123', email: 'test@domain.com' };
 
-  return () => ({
+  const authInstance = {
     currentUser: mockCurrentUser,
     createUserWithEmailAndPassword: jest.fn(() =>
       Promise.resolve({
@@ -28,7 +28,9 @@ jest.mock('@react-native-firebase/auth', () => {
     ),
     signInWithEmailAndPassword: jest.fn(() => Promise.resolve({})),
     signOut: jest.fn(() => Promise.resolve({})),
-  });
+  };
+
+  return () => authInstance;
 });
 
 jest.mock('@react-native-firebase/firestore', () => {
@@ -65,13 +67,16 @@ jest.mock('@react-native-firebase/firestore', () => {
     doc: jest.fn(id => createDocRef(id)),
   };
 
-  return () => ({
+  const firestoreFn = jest.fn(() => ({
     collection: jest.fn(() => ({
       doc: jest.fn(() => ({
         collection: jest.fn(() => collectionRef),
       })),
     })),
-    Timestamp: mockTimestamp,
-    FieldValue: mockFieldValue,
-  });
+  }));
+
+  firestoreFn.Timestamp = mockTimestamp;
+  firestoreFn.FieldValue = mockFieldValue;
+
+  return firestoreFn;
 });

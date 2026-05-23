@@ -115,11 +115,8 @@ export const eventService = {
     const userId = getCurrentUserId();
     const payload: Record<string, unknown> = {
       updatedAt: firestore.FieldValue.serverTimestamp(),
+      date: firestore.Timestamp.fromDate(input.date),
     };
-
-    if (input.date) {
-      payload.date = firestore.Timestamp.fromDate(input.date);
-    }
 
     if (input.hour !== undefined) {
       payload.hour = input.hour;
