@@ -1,34 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import AddEventModal from './components/AddEventModal';
 import Calendar from './components/Calendar';
 import EventList from './components/EventList';
 import PrimaryButton from '../../components/Button';
 import ScreenContainer from '../../components/ScreenContainer';
-import { useToast } from '../../context/ToastContext';
 import { theme } from '../../constants/theme';
-import { eventService } from '../../services/eventService';
+import { useEvents } from '../../hooks/useEvents';
 import { CalendarEvent } from '../../types/event';
 
 function HomeScreen() {
   const currentDate = new Date();
-  const { showToast } = useToast();
+  const { events, saveEvent, deleteEvent } = useEvents();
 
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedDate, setSelectedDate] = useState(currentDate);
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-
-  useEffect(() => {
-    const unsubscribe = eventService.subscribeToEvents(setEvents, () => {
-      showToast({
-        title: 'Failed to load events',
-        type: 'error',
-      });
-    });
-
-    return unsubscribe;
-  }, [showToast]);
 
   const handleCalendarSelectDate = useCallback((date: Date) => {
     setSelectedDate(date);
@@ -38,43 +25,9 @@ function HomeScreen() {
 
   const handleAddEvent = useCallback(
     async (event: { hour: string; minute: string; details: string }) => {
-      try {
-        if (editingEvent) {
-          await eventService.updateEvent(editingEvent.id, {
-            date: selectedDate,
-            ...event,
-          });
-        } else {
-          await eventService.createEvent({
-            date: selectedDate,
-            ...event,
-          });
-        }
-      } catch {
-        showToast({
-          title: editingEvent
-            ? 'Failed to update event'
-            : 'Failed to save event',
-          type: 'error',
-        });
-        throw new Error('Event save failed');
-      }
+      await saveEvent(event, selectedDate, editingEvent);
     },
-    [editingEvent, selectedDate, showToast],
-  );
-
-  const handleDeleteEvent = useCallback(
-    async (event: CalendarEvent) => {
-      try {
-        await eventService.deleteEvent(event.id);
-      } catch {
-        showToast({
-          title: 'Failed to delete event',
-          type: 'error',
-        });
-      }
-    },
-    [showToast],
+    [editingEvent, saveEvent, selectedDate],
   );
 
   const handleEditEvent = useCallback((event: CalendarEvent) => {
@@ -113,7 +66,7 @@ function HomeScreen() {
       <EventList
         events={events}
         onEdit={handleEditEvent}
-        onDelete={handleDeleteEvent}
+        onDelete={deleteEvent}
         ListHeaderComponent={listHeader}
       />
 

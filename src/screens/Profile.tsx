@@ -2,8 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/Button';
-import { useAuth } from '../context/AuthContext';
 import { theme } from '../constants/theme';
+import { useAuth } from '../context/AuthContext';
 
 function ProfileScreen() {
   const { userEmail, logout } = useAuth();

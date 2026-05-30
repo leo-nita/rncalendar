@@ -13,18 +13,14 @@ import { authService } from '../services/authService';
 import InputField from '../components/Input';
 import PrimaryButton from '../components/Button';
 import { validateEmail, validatePassword } from '../utils/validate';
-import { useAuth } from '../context/AuthContext';
 import { authInputStyles, authScreenStyles } from '../styles/authScreenStyles';
 import { useToast } from '../context/ToastContext';
-
-type AuthStackParamList = {
-  Login: undefined;
-  Signup: undefined;
-};
+import { type RootStackParamList } from '../utils/authNavigation';
+import { useAuth } from '../context/AuthContext';
 
 const SignUp = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+    useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
   const { completeCredentialLogin } = useAuth();
   const { showToast } = useToast();
   const [email, setEmail] = useState('');

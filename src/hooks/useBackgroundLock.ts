@@ -1,11 +1,10 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { BACKGROUND_LOCK_TIMEOUT_MS } from '../constants/authStorage';
 import { sessionStorage } from '../services/sessionStorage';
 
 type UseBackgroundLockOptions = {
-  isAuthenticatedRef: RefObject<boolean>;
   onLockRequired: () => void;
   timeoutMs?: number;
 };
@@ -25,7 +24,6 @@ const isReturningToForeground = (
   (previousState === 'inactive' || previousState === 'background');
 
 export const useBackgroundLock = ({
-  isAuthenticatedRef,
   onLockRequired,
   timeoutMs = BACKGROUND_LOCK_TIMEOUT_MS,
 }: UseBackgroundLockOptions): void => {
@@ -48,7 +46,6 @@ export const useBackgroundLock = ({
         backgroundedAtRef.current = null;
 
         const shouldLock =
-          isAuthenticatedRef.current &&
           auth().currentUser !== null &&
           sessionStorage.isBiometricGateEnabled() &&
           elapsed >= timeoutMs;
@@ -67,5 +64,5 @@ export const useBackgroundLock = ({
     );
 
     return () => subscription.remove();
-  }, [isAuthenticatedRef, onLockRequired, timeoutMs]);
+  }, [onLockRequired, timeoutMs]);
 };

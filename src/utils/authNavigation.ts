@@ -1,19 +1,28 @@
-export type AuthNavigatorKey =
-  | 'authenticated'
-  | 'biometric'
-  | 'unauthenticated';
+import { createNavigationContainerRef } from '@react-navigation/native';
 
-export const getAuthNavigatorKey = (
-  isAuthenticated: boolean,
-  requiresBiometricUnlock: boolean,
-): AuthNavigatorKey => {
-  if (isAuthenticated) {
-    return 'authenticated';
-  }
-
-  if (requiresBiometricUnlock) {
-    return 'biometric';
-  }
-
-  return 'unauthenticated';
+export type RootStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  WelcomeBack: undefined;
+  Main: undefined;
 };
+
+export const rootNavigationRef =
+  createNavigationContainerRef<RootStackParamList>();
+
+const resetToRoute = (routeName: keyof RootStackParamList) => {
+  if (!rootNavigationRef.isReady()) {
+    return;
+  }
+
+  rootNavigationRef.reset({
+    index: 0,
+    routes: [{ name: routeName }],
+  });
+};
+
+export const resetToLogin = () => resetToRoute('Login');
+
+export const resetToMain = () => resetToRoute('Main');
+
+export const resetToWelcomeBack = () => resetToRoute('WelcomeBack');

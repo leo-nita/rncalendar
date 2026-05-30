@@ -2,9 +2,9 @@ import { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import PrimaryButton from '../components/Button';
-import { useAuth } from '../context/AuthContext';
 import { biometricService } from '../services/biometricService';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 
 const WelcomeBack = () => {
   const { userEmail, completeBiometricUnlock, goToPasswordLogin } = useAuth();
@@ -16,6 +16,13 @@ const WelcomeBack = () => {
     setIsAuthenticating(true);
 
     try {
+      const isBiometricAvailable =
+        await biometricService.isBiometricAvailable();
+
+      if (!isBiometricAvailable) {
+        return;
+      }
+
       const result = await biometricService.authenticateForUnlock();
 
       if (result.success) {

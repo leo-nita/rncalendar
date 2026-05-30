@@ -47,8 +47,7 @@ function Calendar({ selectedDate, onSelectDate }: CalendarProps) {
   const currentDate = new Date();
   const [calendar, dispatch] = useReducer(
     calendarReducer,
-    undefined,
-    getInitialCalendarState,
+    getInitialCalendarState(),
   );
 
   const daysInMonth = new Date(calendar.year, calendar.month + 1, 0).getDate();

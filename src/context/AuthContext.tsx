@@ -3,7 +3,6 @@ import React, {
   useState,
   useContext,
   useEffect,
-  useRef,
   useCallback,
   useMemo,
 } from 'react';
@@ -11,11 +10,14 @@ import auth from '@react-native-firebase/auth';
 import { authService } from '../services/authService';
 import { sessionStorage } from '../services/sessionStorage';
 import { useBackgroundLock } from '../hooks/useBackgroundLock';
+import {
+  resetToLogin,
+  resetToMain,
+  resetToWelcomeBack,
+} from '../utils/authNavigation';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  isLoading: boolean;
-  requiresBiometricUnlock: boolean;
   userEmail: string | null;
   completeCredentialLogin: (email: string) => void;
   completeBiometricUnlock: () => void;
@@ -28,100 +30,89 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [requiresBiometricUnlock, setRequiresBiometricUnlock] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const isAuthenticatedRef = useRef(isAuthenticated);
-
-  useEffect(() => {
-    isAuthenticatedRef.current = isAuthenticated;
-  }, [isAuthenticated]);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => auth().currentUser !== null,
+  );
+  const [userEmail, setUserEmail] = useState<string | null>(
+    () => sessionStorage.getEmail() ?? auth().currentUser?.email ?? null,
+  );
 
   const lockForBiometric = useCallback(() => {
     setIsAuthenticated(false);
-    setRequiresBiometricUnlock(true);
-  }, []);
-
-  const unlockToApp = useCallback(() => {
-    setRequiresBiometricUnlock(false);
-    setIsAuthenticated(true);
-  }, []);
-
-  const resetToLogin = useCallback(() => {
-    setRequiresBiometricUnlock(false);
-    setIsAuthenticated(false);
+    resetToWelcomeBack();
   }, []);
 
   useBackgroundLock({
-    isAuthenticatedRef,
     onLockRequired: lockForBiometric,
   });
 
   useEffect(() => {
-    // Synchronous: read cached email for instant cold-start navigation
     const cachedEmail = sessionStorage.getEmail();
 
     if (cachedEmail) {
       setUserEmail(cachedEmail);
       sessionStorage.ensureBiometricPreference();
-
-      if (sessionStorage.isBiometricGateEnabled()) {
-        lockForBiometric();
-      } else {
-        resetToLogin();
-      }
     }
 
-    setIsLoading(false);
-
-    // Async: Firebase validates the session in background
     const unsubscribe = auth().onAuthStateChanged(user => {
       if (!user) {
-        // Only act if there's a cached email — means session expired/revoked,
-        // not a normal logout (logout clears MMKV before Firebase fires)
-        const currentEmail = sessionStorage.getEmail();
-        if (currentEmail) {
+        if (sessionStorage.getEmail()) {
           sessionStorage.clearSession();
-          setUserEmail(null);
-          resetToLogin();
         }
-      } else {
-        // Firebase is always authoritative for the email value
-        setUserEmail(user.email ?? null);
+
+        setUserEmail(null);
+        setIsAuthenticated(false);
+        resetToLogin();
+        return;
+      }
+
+      setIsAuthenticated(true);
+
+      if (user.email) {
+        setUserEmail(user.email);
+        sessionStorage.persistEmail(user.email);
       }
     });
 
     return unsubscribe;
-  }, [lockForBiometric, resetToLogin]);
+  }, []);
 
   const completeCredentialLogin = useCallback((email: string) => {
     setUserEmail(email);
-    setRequiresBiometricUnlock(false);
     setIsAuthenticated(true);
     sessionStorage.enableBiometric();
+    resetToMain();
   }, []);
 
   const completeBiometricUnlock = useCallback(() => {
-    unlockToApp();
-  }, [unlockToApp]);
+    if (!auth().currentUser) {
+      sessionStorage.clearSession();
+      setUserEmail(null);
+      setIsAuthenticated(false);
+      resetToLogin();
+      return;
+    }
+
+    setIsAuthenticated(true);
+    resetToMain();
+  }, []);
 
   const goToPasswordLogin = useCallback(() => {
     sessionStorage.disableBiometric();
+    setIsAuthenticated(false);
     resetToLogin();
-  }, [resetToLogin]);
+  }, []);
 
   const logout = useCallback(async () => {
     await authService.logout();
     setUserEmail(null);
+    setIsAuthenticated(false);
     resetToLogin();
-  }, [resetToLogin]);
+  }, []);
 
   const value = useMemo(
     () => ({
       isAuthenticated,
-      isLoading,
-      requiresBiometricUnlock,
       userEmail,
       completeCredentialLogin,
       completeBiometricUnlock,
@@ -130,8 +121,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }),
     [
       isAuthenticated,
-      isLoading,
-      requiresBiometricUnlock,
       userEmail,
       completeCredentialLogin,
       completeBiometricUnlock,

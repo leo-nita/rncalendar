@@ -6,18 +6,10 @@ import {
   CalendarEvent,
   CreateEventInput,
   UpdateEventInput,
+  FirestoreEventData,
 } from '../types/event';
 
 const EVENTS_COLLECTION = 'events';
-
-type FirestoreEventData = {
-  date: FirebaseFirestoreTypes.Timestamp;
-  hour: string;
-  minute: string;
-  details: string;
-  createdAt: FirebaseFirestoreTypes.FieldValue;
-  updatedAt: FirebaseFirestoreTypes.FieldValue;
-};
 
 function getCurrentUserId(): string {
   const user = auth().currentUser;
@@ -70,13 +62,18 @@ function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
 }
 
 export const eventService = {
-  createEvent: async (input: CreateEventInput): Promise<CalendarEvent> => {
+  createEvent: async ({
+    date,
+    hour,
+    minute,
+    details,
+  }: CreateEventInput): Promise<CalendarEvent> => {
     const userId = getCurrentUserId();
     const payload: FirestoreEventData = {
-      date: firestore.Timestamp.fromDate(input.date),
-      hour: input.hour,
-      minute: input.minute,
-      details: input.details,
+      date: firestore.Timestamp.fromDate(date),
+      hour: hour,
+      minute: minute,
+      details: details,
       createdAt: firestore.FieldValue.serverTimestamp(),
       updatedAt: firestore.FieldValue.serverTimestamp(),
     };
@@ -85,10 +82,10 @@ export const eventService = {
 
     return {
       id: docRef.id,
-      date: input.date,
-      hour: input.hour,
-      minute: input.minute,
-      details: input.details,
+      date,
+      hour,
+      minute,
+      details,
     };
   },
 
@@ -110,24 +107,24 @@ export const eventService = {
 
   updateEvent: async (
     eventId: string,
-    input: UpdateEventInput,
+    { date, hour, minute, details }: UpdateEventInput,
   ): Promise<void> => {
     const userId = getCurrentUserId();
     const payload: Record<string, unknown> = {
       updatedAt: firestore.FieldValue.serverTimestamp(),
-      date: firestore.Timestamp.fromDate(input.date),
+      date: firestore.Timestamp.fromDate(date),
     };
 
-    if (input.hour !== undefined) {
-      payload.hour = input.hour;
+    if (hour !== undefined) {
+      payload.hour = hour;
     }
 
-    if (input.minute !== undefined) {
-      payload.minute = input.minute;
+    if (minute !== undefined) {
+      payload.minute = minute;
     }
 
-    if (input.details !== undefined) {
-      payload.details = input.details;
+    if (details !== undefined) {
+      payload.details = details;
     }
 
     await getUserEventsCollection(userId).doc(eventId).update(payload);

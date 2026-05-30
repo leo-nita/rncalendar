@@ -1,47 +1,26 @@
 import * as React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainTabs from './MainTabs';
-import { AuthProvider, useAuth } from '../context/AuthContext';
 import Login from '../screens/Login';
 import SignUp from '../screens/Signup';
 import WelcomeBack from '../screens/WelcomeBack';
-import { getAuthNavigatorKey } from '../utils/authNavigation';
+import {
+  rootNavigationRef,
+  type RootStackParamList,
+} from '../utils/authNavigation';
 import { ToastProvider } from '../context/ToastContext';
+import { AuthProvider } from '../context/AuthContext';
 
-const Stack = createNativeStackNavigator();
-
-const AuthLoadingScreen = () => (
-  <View style={styles.loading}>
-    <Text>Loading...</Text>
-  </View>
-);
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootStack() {
-  const { isAuthenticated, isLoading, requiresBiometricUnlock } = useAuth();
-
-  if (isLoading) {
-    return <AuthLoadingScreen />;
-  }
-
-  const navigatorKey = getAuthNavigatorKey(
-    isAuthenticated,
-    requiresBiometricUnlock,
-  );
-
   return (
-    <Stack.Navigator key={navigatorKey} screenOptions={{ headerShown: false }}>
-      {isAuthenticated && <Stack.Screen name="Main" component={MainTabs} />}
-      {!isAuthenticated && requiresBiometricUnlock && (
-        <Stack.Screen name="WelcomeBack" component={WelcomeBack} />
-      )}
-      {!isAuthenticated && !requiresBiometricUnlock && (
-        <>
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Signup" component={SignUp} />
-        </>
-      )}
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Signup" component={SignUp} />
+      <Stack.Screen name="WelcomeBack" component={WelcomeBack} />
+      <Stack.Screen name="Main" component={MainTabs} />
     </Stack.Navigator>
   );
 }
@@ -50,18 +29,10 @@ export default function RootNavigator() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <NavigationContainer>
+        <NavigationContainer ref={rootNavigationRef}>
           <RootStack />
         </NavigationContainer>
       </ToastProvider>
     </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  loading: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

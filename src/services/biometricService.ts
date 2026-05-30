@@ -13,7 +13,8 @@ const WELCOME_BACK_PROMPT = {
   title: 'Welcome back',
   subtitle: 'Verify your identity to continue',
   cancelLabel: 'Use password',
-  allowDeviceCredentials: true,
+  allowDeviceCredentials: false,
+  disableDeviceFallback: true,
 } as const;
 
 export const biometricService = {
@@ -43,7 +44,7 @@ export const biometricService = {
     } catch {
       return {
         success: false,
-        error: 'System error during authentication',
+        error: 'Please try again or use your password.',
       };
     }
   },

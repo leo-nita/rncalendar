@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,24 +7,21 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { authService } from '../services/authService';
 import InputField from '../components/Input';
 import PrimaryButton from '../components/Button';
 import { validateEmail, validatePassword } from '../utils/validate';
-import { useAuth } from '../context/AuthContext';
 import { authInputStyles, authScreenStyles } from '../styles/authScreenStyles';
 import { useToast } from '../context/ToastContext';
-
-type AuthStackParamList = {
-  Login: undefined;
-  Signup: undefined;
-};
+import { sessionStorage } from '../services/sessionStorage';
+import { type RootStackParamList } from '../utils/authNavigation';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+    useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
   const { completeCredentialLogin } = useAuth();
   const { showToast } = useToast();
 
@@ -32,6 +29,22 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const cachedEmail = sessionStorage.getEmail();
+
+      if (!cachedEmail) {
+        return;
+      }
+
+      sessionStorage.ensureBiometricPreference();
+
+      if (sessionStorage.isBiometricGateEnabled()) {
+        navigation.replace('WelcomeBack');
+      }
+    }, [navigation]),
+  );
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
