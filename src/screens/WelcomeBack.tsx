@@ -19,7 +19,15 @@ const WelcomeBack = () => {
       const result = await biometricService.authenticateForUnlock();
 
       if (result.success) {
-        completeBiometricUnlock();
+        const didUnlock = await completeBiometricUnlock();
+
+        if (!didUnlock) {
+          showToast({
+            type: 'error',
+            title: 'Session expired',
+            description: 'Please log in again.',
+          });
+        }
       } else if (!result.isUserCancelled) {
         showToast({
           type: 'error',

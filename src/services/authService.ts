@@ -36,8 +36,9 @@ export const authService = {
         email.trim(),
         password,
       );
-      sessionStorage.persistEmail(email);
-      return { user: userCredential.user };
+      const token = await userCredential.user.getIdToken();
+      sessionStorage.persistToken(token);
+      return { user: userCredential.user, token };
     } catch (error) {
       const msg = handleGlobalBackendError(error as FirebaseErrors);
       throw new Error(msg);
@@ -50,8 +51,9 @@ export const authService = {
         email.trim(),
         password,
       );
-      sessionStorage.persistEmail(email);
-      return { user: userCredential.user };
+      const token = await userCredential.user.getIdToken();
+      sessionStorage.persistToken(token);
+      return { user: userCredential.user, token };
     } catch (error) {
       const msg = handleGlobalBackendError(error as FirebaseErrors);
       throw new Error(msg);

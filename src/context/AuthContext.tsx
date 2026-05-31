@@ -18,7 +18,7 @@ interface AuthContextType {
   requiresBiometricUnlock: boolean;
   userEmail: string | null;
   completeCredentialLogin: (email: string) => void;
-  completeBiometricUnlock: () => void;
+  completeBiometricUnlock: () => Promise<boolean>;
   goToPasswordLogin: () => void;
   logout: () => Promise<void>;
 }
@@ -53,17 +53,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsAuthenticated(false);
   }, []);
 
+  const clearAuthSession = useCallback(() => {
+    sessionStorage.clearSession();
+    setUserEmail(null);
+    resetToLogin();
+  }, [resetToLogin]);
+
+  const refreshCurrentUserToken = useCallback(async () => {
+    const currentUser = auth().currentUser;
+
+    if (!currentUser) {
+      clearAuthSession();
+      return false;
+    }
+
+    try {
+      const token = await currentUser.getIdToken(true);
+      sessionStorage.persistToken(token);
+      setUserEmail(currentUser.email ?? null);
+      return true;
+    } catch {
+      clearAuthSession();
+      return false;
+    }
+  }, [clearAuthSession]);
+
   useBackgroundLock({
     isAuthenticatedRef,
     onLockRequired: lockForBiometric,
   });
 
   useEffect(() => {
-    // Synchronous: read cached email for instant cold-start navigation
-    const cachedEmail = sessionStorage.getEmail();
+    // Synchronous: read cached token for instant cold-start navigation
+    const cachedToken = sessionStorage.getToken();
 
-    if (cachedEmail) {
-      setUserEmail(cachedEmail);
+    if (cachedToken) {
       sessionStorage.ensureBiometricPreference();
 
       if (sessionStorage.isBiometricGateEnabled()) {
@@ -78,22 +102,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // Async: Firebase validates the session in background
     const unsubscribe = auth().onAuthStateChanged(user => {
       if (!user) {
-        // Only act if there's a cached email — means session expired/revoked,
+        // Only act if there's a cached token - means session expired/revoked,
         // not a normal logout (logout clears MMKV before Firebase fires)
-        const currentEmail = sessionStorage.getEmail();
-        if (currentEmail) {
-          sessionStorage.clearSession();
-          setUserEmail(null);
-          resetToLogin();
+        const currentToken = sessionStorage.getToken();
+        if (currentToken) {
+          clearAuthSession();
         }
       } else {
-        // Firebase is always authoritative for the email value
-        setUserEmail(user.email ?? null);
+        void refreshCurrentUserToken();
       }
     });
 
     return unsubscribe;
-  }, [lockForBiometric, resetToLogin]);
+  }, [
+    clearAuthSession,
+    lockForBiometric,
+    refreshCurrentUserToken,
+    resetToLogin,
+  ]);
 
   const completeCredentialLogin = useCallback((email: string) => {
     setUserEmail(email);
@@ -102,9 +128,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     sessionStorage.enableBiometric();
   }, []);
 
-  const completeBiometricUnlock = useCallback(() => {
-    unlockToApp();
-  }, [unlockToApp]);
+  const completeBiometricUnlock = useCallback(async () => {
+    const hasFreshToken = await refreshCurrentUserToken();
+
+    if (hasFreshToken) {
+      unlockToApp();
+    }
+
+    return hasFreshToken;
+  }, [refreshCurrentUserToken, unlockToApp]);
 
   const goToPasswordLogin = useCallback(() => {
     sessionStorage.disableBiometric();

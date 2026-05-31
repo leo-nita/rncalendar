@@ -2,16 +2,16 @@ import { AUTH_STORAGE_KEYS } from '../constants/authStorage';
 import { storage } from './storage';
 
 export const sessionStorage = {
-  getEmail(): string | undefined {
-    return storage.getString(AUTH_STORAGE_KEYS.email);
+  getToken(): string | undefined {
+    return storage.getString(AUTH_STORAGE_KEYS.token);
   },
 
-  persistEmail(email: string): void {
-    storage.set(AUTH_STORAGE_KEYS.email, email.trim());
+  persistToken(token: string): void {
+    storage.set(AUTH_STORAGE_KEYS.token, token);
   },
 
   clearSession(): void {
-    storage.remove(AUTH_STORAGE_KEYS.email);
+    storage.remove(AUTH_STORAGE_KEYS.token);
     storage.remove(AUTH_STORAGE_KEYS.biometricEnabled);
   },
 
