@@ -7,6 +7,7 @@ export type BiometricAuthResult = {
   success: boolean;
   error?: string;
   isUserCancelled?: boolean;
+  isBiometricUnavailable?: boolean;
 };
 
 const WELCOME_BACK_PROMPT = {
@@ -16,18 +17,30 @@ const WELCOME_BACK_PROMPT = {
   allowDeviceCredentials: true,
 } as const;
 
+const isBiometricAvailable = async (): Promise<boolean> => {
+  try {
+    const { available } = await isSensorAvailable();
+    return !!available;
+  } catch {
+    return false;
+  }
+};
+
 export const biometricService = {
-  isBiometricAvailable: async (): Promise<boolean> => {
-    try {
-      const { available } = await isSensorAvailable();
-      return !!available;
-    } catch {
-      return false;
-    }
-  },
+  isBiometricAvailable,
 
   authenticateForUnlock: async (): Promise<BiometricAuthResult> => {
     try {
+      const isAvailable = await isBiometricAvailable();
+
+      if (!isAvailable) {
+        return {
+          success: false,
+          error: 'Biometric authentication is not available.',
+          isBiometricUnavailable: true,
+        };
+      }
+
       const result = await authenticateWithOptions(WELCOME_BACK_PROMPT);
 
       if (result.success) {

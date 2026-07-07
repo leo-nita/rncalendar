@@ -18,7 +18,9 @@ const WelcomeBack = () => {
     try {
       const result = await biometricService.authenticateForUnlock();
 
-      if (result.success) {
+      if (result.isBiometricUnavailable) {
+        goToPasswordLogin();
+      } else if (result.success) {
         const didUnlock = await completeBiometricUnlock();
 
         if (!didUnlock) {
@@ -38,7 +40,7 @@ const WelcomeBack = () => {
     } finally {
       setIsAuthenticating(false);
     }
-  }, [completeBiometricUnlock, showToast]);
+  }, [completeBiometricUnlock, goToPasswordLogin, showToast]);
 
   useFocusEffect(
     useCallback(() => {
